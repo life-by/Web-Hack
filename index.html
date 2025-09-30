@@ -1,116 +1,444 @@
-<!-- admin.html -->
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>অ্যাডমিন প্যানেল - নোটিফিকেশন সিস্টেম</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>নোটিফিকেশন সিস্টেম অ্যাডমিন প্যানেল</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; max-width: 700px; margin: auto; background-color: #f4f7f6; }
-        h1 { color: #333; }
-        .container { background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        textarea { height: 120px; resize: vertical; }
-        button { padding: 12px 25px; cursor: pointer; border: none; border-radius: 5px; color: white; font-size: 16px; }
-        .publish-btn { background-color: #28a745; }
-        .deactivate-btn { background-color: #dc3545; margin-left: 10px; }
-        #status { margin-top: 25px; font-weight: bold; padding: 10px; border-radius: 5px; }
-        .warning { color: #856404; background-color: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .header h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .status {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .notification-preview {
+            background-color: #e7f3ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+        }
+        
+        .notification-preview h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .instructions {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 0.5rem;
+            color: #856404;
+        }
+        
+        .instructions ol {
+            padding-left: 1.5rem;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .notification-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .notification-content {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: auto;
+            padding: 0;
+            flex: 0 0 auto;
+        }
+        
+        .close-btn:hover {
+            color: #ffcccb;
+        }
+        
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>নোটিফিকেশন ম্যানেজমেন্ট</h1>
-        <p class="warning"><b>সতর্কতা:</b> আপনার GitHub Personal Access Token (PAT) এখানে পেস্ট করুন। এটি কোথাও সেভ করা হবে না এবং পেজ রিলোড করলে মুছে যাবে।</p>
-
-        <label for="githubToken">GitHub Personal Access Token (repo scope):</label>
-        <input type="password" id="githubToken" placeholder="আপনার নতুন এবং নিরাপদ টোকেন এখানে দিন">
-
-        <label for="notificationMessage">নোটিফিকেশন মেসেজ (HTML ট্যাগ ব্যবহার করতে পারেন):</label>
-        <textarea id="notificationMessage" placeholder="আপনার ব্যবহারকারীদের জন্য বার্তা লিখুন..."></textarea>
-
-        <button class="publish-btn" onclick="updateNotification(true)">পাবলিশ করুন</button>
-        <button class="deactivate-btn" onclick="updateNotification(false)">নিষ্ক্রিয় করুন</button>
-
-        <div id="status"></div>
+        <div class="header">
+            <h1>নোটিফিকেশন সিস্টেম অ্যাডমিন প্যানেল</h1>
+            <p>GitHub রিপোজিটরি ব্যবহার করে নোটিফিকেশন ব্যবস্থাপনা</p>
+        </div>
+        
+        <div class="card">
+            <div class="form-group">
+                <label for="github-token">GitHub Personal Access Token</label>
+                <input type="password" id="github-token" placeholder="আপনার GitHub Personal Access Token লিখুন">
+                <small>এই টোকেন কোথাও সেভ করা হবে না, শুধুমাত্র বর্তমান সেশনে ব্যবহার করা হবে</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="repo-url">GitHub রিপোজিটরি URL</label>
+                <input type="text" id="repo-url" placeholder="https://github.com/username/repository">
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="form-group">
+                <label for="notification-message">নোটিফিকেশন বার্তা (HTML সমর্থিত)</label>
+                <textarea id="notification-message" placeholder="আপনার নোটিফিকেশন বার্তা লিখুন..."></textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button id="publish-btn" class="btn-primary">পাবলিশ করুন</button>
+                <button id="deactivate-btn" class="btn-secondary">নিষ্ক্রিয় করুন</button>
+            </div>
+            
+            <div id="status-message" class="status"></div>
+            
+            <div class="notification-preview">
+                <h3>প্রিভিউ:</h3>
+                <div id="preview-content"></div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>ব্যবহার নির্দেশিকা:</h3>
+            <ol>
+                <li>আপনার GitHub অ্যাকাউন্ট থেকে একটি Personal Access Token তৈরি করুন</li>
+                <li>উপরে টোকেন এবং রিপোজিটরি URL ইনপুট করুন</li>
+                <li>নোটিফিকেশন বার্তা লিখুন (HTML ট্যাগ ব্যবহার করতে পারেন)</li>
+                <li>"পাবলিশ করুন" বাটনে ক্লিক করুন নোটিফিকেশন সক্রিয় করতে</li>
+                <li>"নিষ্ক্রিয় করুন" বাটনে ক্লিক করুন নোটিফিকেশন বন্ধ করতে</li>
+                <li>আপনার ওয়েবসাইটে notification.js ফাইলটি যুক্ত করুন</li>
+            </ol>
+        </div>
     </div>
 
     <script>
-        const GITHUB_USERNAME = "life-by";
-        const REPO_NAME = "Web-Hack";
-        const FILE_PATH = "notifications.json";
-        const API_URL = `https://api.github.com/repos/${GITHUB_USERNAME}/${REPO_NAME}/contents/${FILE_PATH}`;
-
-        async function updateNotification(isActive) {
-            const token = document.getElementById('githubToken').value;
-            const message = document.getElementById('notificationMessage').value;
-            const statusDiv = document.getElementById('status');
-
-            if (!token) {
-                statusDiv.innerText = 'ত্রুটি: GitHub Token অবশ্যই দিতে হবে।';
-                statusDiv.style.color = 'red';
-                return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const githubTokenInput = document.getElementById('github-token');
+            const repoUrlInput = document.getElementById('repo-url');
+            const messageTextarea = document.getElementById('notification-message');
+            const publishBtn = document.getElementById('publish-btn');
+            const deactivateBtn = document.getElementById('deactivate-btn');
+            const statusMessage = document.getElementById('status-message');
+            const previewContent = document.getElementById('preview-content');
+            
+            // প্রিভিউ আপডেট
+            messageTextarea.addEventListener('input', updatePreview);
+            
+            function updatePreview() {
+                previewContent.innerHTML = messageTextarea.value || 'বার্তা লিখলে প্রিভিউ এখানে দেখানো হবে...';
             }
-
-            if (isActive && !message) {
-                statusDiv.innerText = 'ত্রুটি: পাবলিশ করার জন্য মেসেজ খালি রাখা যাবে না।';
-                statusDiv.style.color = 'red';
-                return;
-            }
-
-            statusDiv.innerText = 'আপডেট করা হচ্ছে...';
-            statusDiv.style.color = 'orange';
-
-            try {
-                // ধাপ ১: ফাইলের বর্তমান SHA হ্যাশ আনা হচ্ছে
-                const fileResponse = await fetch(API_URL, {
-                    headers: { 'Authorization': `token ${token}` }
-                });
+            
+            // প্রাথমিক প্রিভিউ সেট করা
+            updatePreview();
+            
+            // পাবলিশ বাটন ক্লিক হ্যান্ডলার
+            publishBtn.addEventListener('click', function() {
+                const token = githubTokenInput.value.trim();
+                const repoUrl = repoUrlInput.value.trim();
+                const message = messageTextarea.value.trim();
                 
-                if (!fileResponse.ok) {
-                     throw new Error(`ফাইল পাওয়া যায়নি। রিপোজিটরিতে notifications.json ফাইলটি আছে কিনা নিশ্চিত করুন।`);
+                if (!token) {
+                    showStatus('GitHub Personal Access Token প্রয়োজন', 'error');
+                    return;
                 }
-
-                const fileData = await fileResponse.json();
-                const sha = fileData.sha;
-
-                // ধাপ ২: নতুন কনটেন্ট তৈরি করা হচ্ছে
-                const newContent = {
-                    id: new Date().getTime(),
+                
+                if (!repoUrl) {
+                    showStatus('GitHub রিপোজিটরি URL প্রয়োজন', 'error');
+                    return;
+                }
+                
+                if (!message) {
+                    showStatus('নোটিফিকেশন বার্তা প্রয়োজন', 'error');
+                    return;
+                }
+                
+                // রিপোজিটরি URL থেকে ব্যবহারকারী এবং রিপো নাম বের করা
+                const repoMatch = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+                if (!repoMatch) {
+                    showStatus('ভুল GitHub রিপোজিটরি URL', 'error');
+                    return;
+                }
+                
+                const username = repoMatch[1];
+                const repoName = repoMatch[2].replace(/\.git$/, '');
+                
+                // JSON ডেটা তৈরি
+                const notificationData = {
+                    id: Date.now(),
                     message: message,
-                    active: isActive,
+                    active: true,
                     timestamp: new Date().toISOString()
                 };
                 
-                const encodedContent = btoa(unescape(encodeURIComponent(JSON.stringify(newContent, null, 2))));
-
-                // ধাপ ৩: GitHub API ব্যবহার করে ফাইল আপডেট করা হচ্ছে
-                const updateResponse = await fetch(API_URL, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: `Notification updated via Admin Panel`,
-                        content: encodedContent,
-                        sha: sha 
-                    })
-                });
-
-                if (updateResponse.ok) {
-                    statusDiv.innerText = 'নোটিফিকেশন সফলভাবে আপডেট হয়েছে!';
-                    statusDiv.style.color = 'green';
-                } else {
-                    const error = await updateResponse.json();
-                    statusDiv.innerText = `ত্রুটি: ${error.message}`;
-                    statusDiv.style.color = 'red';
+                // GitHub API-তে JSON ফাইল আপডেট করা
+                updateNotificationFile(token, username, repoName, notificationData);
+            });
+            
+            // নিষ্ক্রিয় বাটন ক্লিক হ্যান্ডলার
+            deactivateBtn.addEventListener('click', function() {
+                const token = githubTokenInput.value.trim();
+                const repoUrl = repoUrlInput.value.trim();
+                
+                if (!token) {
+                    showStatus('GitHub Personal Access Token প্রয়োজন', 'error');
+                    return;
                 }
-            } catch (error) {
-                statusDiv.innerText = `একটি অপ্রত্যাশিত সমস্যা হয়েছে: ${error.message}`;
-                statusDiv.style.color = 'red';
+                
+                if (!repoUrl) {
+                    showStatus('GitHub রিপোজিটরি URL প্রয়োজন', 'error');
+                    return;
+                }
+                
+                // রিপোজিটরি URL থেকে ব্যবহারকারী এবং রিপো নাম বের করা
+                const repoMatch = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+                if (!repoMatch) {
+                    showStatus('ভুল GitHub রিপোজিটরি URL', 'error');
+                    return;
+                }
+                
+                const username = repoMatch[1];
+                const repoName = repoMatch[2].replace(/\.git$/, '');
+                
+                // JSON ডেটা তৈরি (নিষ্ক্রিয় করা)
+                const notificationData = {
+                    id: Date.now(),
+                    message: messageTextarea.value.trim() || "ডিফল্ট বার্তা",
+                    active: false,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // GitHub API-তে JSON ফাইল আপডেট করা
+                updateNotificationFile(token, username, repoName, notificationData);
+            });
+            
+            // GitHub API-তে ফাইল আপডেট করার ফাংশন
+            async function updateNotificationFile(token, username, repoName, notificationData) {
+                try {
+                    showStatus('আপডেট করা হচ্ছে...', '');
+                    
+                    // প্রথমে বর্তমান ফাইলটি পড়ার চেষ্টা করা (যদি থাকে)
+                    let sha = null;
+                    try {
+                        const fileResponse = await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/notifications.json`, {
+                            headers: {
+                                'Authorization': `token ${token}`,
+                                'Accept': 'application/vnd.github.v3+json'
+                            }
+                        });
+                        
+                        if (fileResponse.ok) {
+                            const fileData = await fileResponse.json();
+                            sha = fileData.sha;
+                        }
+                    } catch (error) {
+                        // ফাইল না থাকলে নতুন তৈরি হবে
+                        console.log('ফাইল পাওয়া যায়নি, নতুন তৈরি করা হবে');
+                    }
+                    
+                    // ফাইল তৈরি বা আপডেট করা
+                    const content = btoa(JSON.stringify(notificationData, null, 2));
+                    const updateResponse = await fetch(`https://api.github.com/repos/${username}/${repoName}/contents/notifications.json`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: `নোটিফিকেশন আপডেট: ${new Date().toLocaleString()}`,
+                            content: content,
+                            sha: sha
+                        })
+                    });
+                    
+                    if (updateResponse.ok) {
+                        showStatus('নোটিফিকেশন সফলভাবে আপডেট করা হয়েছে!', 'success');
+                    } else {
+                        const errorData = await updateResponse.json();
+                        showStatus(`ত্রুটি: ${errorData.message || 'অজানা ত্রুটি'}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`নেটওয়ার্ক ত্রুটি: ${error.message}`, 'error');
+                }
             }
-        }
+            
+            // স্ট্যাটাস মেসেজ দেখানোর ফাংশন
+            function showStatus(message, type) {
+                statusMessage.textContent = message;
+                statusMessage.className = 'status';
+                
+                if (type === 'success') {
+                    statusMessage.classList.add('success');
+                } else if (type === 'error') {
+                    statusMessage.classList.add('error');
+                }
+                
+                // 5 সেকেন্ড পর স্ট্যাটাস মেসেজ অদৃশ্য করা
+                if (type) {
+                    setTimeout(() => {
+                        statusMessage.className = 'status';
+                    }, 5000);
+                }
+            }
+        });
     </script>
 </body>
 </html>
