@@ -1,4 +1,5 @@
-// notification.js - ক্লায়েন্ট-সাইড স্ক্রিপ্ট
+<script>
+// notification.js - সরাসরি কোড
 (function() {
     'use strict';
     
@@ -105,7 +106,7 @@
                 }
                 
                 body {
-                    margin-top: 60px; /* নোটিফিকেশন বারের জন্য স্থান */
+                    margin-top: 60px;
                 }
                 
                 @media (max-width: 768px) {
@@ -142,12 +143,5 @@
             showNotification(notificationData.message);
         }
     });
-    
-    // পেজের সকল লিংক ক্লিক করার সময় নোটিফিকেশন বন্ধ না হওয়া নিশ্চিত করা
-    document.addEventListener('click', function(e) {
-        if (e.target.tagName === 'A') {
-            // লিংক ক্লিক করলে নোটিফিকেশন বন্ধ হবে না
-            return;
-        }
-    });
 })();
+</script>
