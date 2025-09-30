@@ -1,5 +1,5 @@
 // notification.js
-fetch(NOTIFICATION_URL + '?v=' + new Date().getTime())
+
 document.addEventListener("DOMContentLoaded", function() {
     // আপনার ইউজারনেম এবং রিপোজিটরির নাম এখানে দেওয়া আছে
     const GITHUB_USERNAME = "life-by";
@@ -81,3 +81,4 @@ document.addEventListener("DOMContentLoaded", function() {
         .catch(error => console.error('Error fetching notification:', error));
 
 });
+
