@@ -1,84 +1,124 @@
-// notification.js
-
-document.addEventListener("DOMContentLoaded", function() {
-    // আপনার ইউজারনেম এবং রিপোজিটরির নাম এখানে দেওয়া আছে
-    const GITHUB_USERNAME = "life-by";
-    const REPO_NAME = "Web-Hack";
+// notification.js - ক্লায়েন্ট-সাইড স্ক্রিপ্ট
+(function() {
+    'use strict';
     
-    // jsDelivr ব্যবহার করে JSON ফাইল লোড করা হচ্ছে
-    const NOTIFICATION_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_USERNAME}/${REPO_NAME}/notifications.json`;
-
-    // Cache-busting এর জন্য ইউআরএলে বর্তমান সময় যোগ করা হয়েছে, যাতে নতুন নোটিফিকেশন দ্রুত লোড হয়
-    fetch(NOTIFICATION_URL + '?v=' + new Date().getTime()) 
-        .then(response => {
+    // GitHub রিপোজিটরি থেকে notifications.json লোড করার ফাংশন
+    async function loadNotification() {
+        try {
+            // Cache busting এর জন্য টাইমস্ট্যাম্প যোগ করা
+            const timestamp = new Date().getTime();
+            const response = await fetch(`https://cdn.jsdelivr.net/gh/your-username/your-repository@main/notifications.json?v=${timestamp}`);
+            
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data && data.active) {
-                // নোটিফিকেশন দেখানোর জন্য একটি div তৈরি করা হচ্ছে
-                const notificationBar = document.createElement('div');
-                notificationBar.id = 'custom-notification-bar-id';
+            
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('নোটিফিকেশন লোড করতে সমস্যা:', error);
+            return null;
+        }
+    }
+    
+    // নোটিফিকেশন বার তৈরি এবং দেখানোর ফাংশন
+    function showNotification(message) {
+        // যদি ইতিমধ্যে নোটিফিকেশন বার থাকে তবে সরানো
+        const existingNotification = document.getElementById('website-notification-bar');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        // নতুন নোটিফিকেশন বার তৈরি
+        const notificationBar = document.createElement('div');
+        notificationBar.id = 'website-notification-bar';
+        notificationBar.className = 'notification-bar';
+        
+        notificationBar.innerHTML = `
+            <div class="notification-content">${message}</div>
+            <button class="close-btn" aria-label="বন্ধ করুন">&times;</button>
+        `;
+        
+        // বডির শুরুতে যোগ করা
+        document.body.insertBefore(notificationBar, document.body.firstChild);
+        
+        // বন্ধ বাটনে ইভেন্ট লিসেনার যোগ
+        const closeBtn = notificationBar.querySelector('.close-btn');
+        closeBtn.addEventListener('click', function() {
+            notificationBar.remove();
+            // স্থানীয়ভাবে স্টোর করা যে ব্যবহারকারী নোটিফিকেশন বন্ধ করেছে
+            localStorage.setItem('notificationClosed', 'true');
+        });
+        
+        // CSS স্টাইল যোগ (যদি ইতিমধ্যে না থাকে)
+        if (!document.getElementById('notification-styles')) {
+            const styles = document.createElement('style');
+            styles.id = 'notification-styles';
+            styles.textContent = `
+                .notification-bar {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    background-color: #4a6fa5;
+                    color: white;
+                    padding: 0.75rem 1rem;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    z-index: 1000;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                }
                 
-                // নোটিফিকেশনের মেসেজ
-                const messageP = document.createElement('p');
-                messageP.innerHTML = data.message;
+                .notification-content {
+                    flex: 1;
+                    margin-right: 1rem;
+                }
                 
-                // নোটিফিকেশন বন্ধ করার বাটন
-                const closeButton = document.createElement('button');
-                closeButton.innerHTML = '&times;'; // 'x' চিহ্ন
-                closeButton.onclick = function() {
-                    notificationBar.style.display = 'none';
-                };
+                .notification-bar .close-btn {
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 1.5rem;
+                    cursor: pointer;
+                    width: auto;
+                    padding: 0;
+                    flex: 0 0 auto;
+                }
                 
-                notificationBar.appendChild(messageP);
-                notificationBar.appendChild(closeButton);
+                .notification-bar .close-btn:hover {
+                    color: #ffcccb;
+                }
                 
-                // ওয়েবসাইটের শুরুতে নোটিফিকেশন বার যুক্ত করা
-                document.body.insertBefore(notificationBar, document.body.firstChild);
+                body {
+                    margin-top: 60px; /* নোটিফিকেশন বারের জন্য স্থান */
+                }
                 
-                // নোটিফিকেশন বারের জন্য স্টাইল
-                const styles = `
-                    #custom-notification-bar-id {
-                        position: sticky;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        background-color: #007bff;
-                        color: white;
-                        padding: 12px 20px;
-                        text-align: center;
-                        z-index: 10000;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        box-sizing: border-box;
-                        font-family: Arial, sans-serif;
-                        font-size: 16px;
+                @media (max-width: 768px) {
+                    .notification-bar {
+                        padding: 0.5rem;
                     }
-                    #custom-notification-bar-id p {
-                        margin: 0;
-                        padding-right: 20px;
+                    
+                    body {
+                        margin-top: 50px;
                     }
-                    #custom-notification-bar-id button {
-                        background: none;
-                        border: none;
-                        color: white;
-                        font-size: 24px;
-                        cursor: pointer;
-                        line-height: 1;
-                    }
-                `;
-                
-                const styleSheet = document.createElement("style");
-                styleSheet.type = "text/css";
-                styleSheet.innerText = styles;
-                document.head.appendChild(styleSheet);
-            }
-        })
-        .catch(error => console.error('Error fetching notification:', error));
-
-});
-
+                }
+            `;
+            document.head.appendChild(styles);
+        }
+    }
+    
+    // পৃষ্ঠা লোড হলে নোটিফিকেশন চেক করা
+    document.addEventListener('DOMContentLoaded', async function() {
+        // যদি ব্যবহারকারী ইতিমধ্যে নোটিফিকেশন বন্ধ করে থাকে তবে দেখানো হবে না
+        if (localStorage.getItem('notificationClosed') === 'true') {
+            return;
+        }
+        
+        const notificationData = await loadNotification();
+        
+        if (notificationData && notificationData.active && notificationData.message) {
+            showNotification(notificationData.message);
+        }
+    });
+})();
