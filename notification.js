@@ -7,7 +7,7 @@
         try {
             // Cache busting এর জন্য টাইমস্ট্যাম্প যোগ করা
             const timestamp = new Date().getTime();
-            const response = await fetch(`https://cdn.jsdelivr.net/gh/your-username/your-repository@main/notifications.json?v=${timestamp}`);
+            const response = await fetch(`https://cdn.jsdelivr.net/gh/life-by/Web-Hack/notifications.json?v=${timestamp}`);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -68,11 +68,21 @@
                     align-items: center;
                     z-index: 1000;
                     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                    font-family: system-ui, -apple-system, sans-serif;
                 }
                 
                 .notification-content {
                     flex: 1;
                     margin-right: 1rem;
+                }
+                
+                .notification-content a {
+                    color: #ffeb3b;
+                    text-decoration: underline;
+                }
+                
+                .notification-content a:hover {
+                    color: #ffff72;
                 }
                 
                 .notification-bar .close-btn {
@@ -81,13 +91,17 @@
                     color: white;
                     font-size: 1.5rem;
                     cursor: pointer;
-                    width: auto;
-                    padding: 0;
-                    flex: 0 0 auto;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    transition: background-color 0.3s;
                 }
                 
                 .notification-bar .close-btn:hover {
-                    color: #ffcccb;
+                    background-color: rgba(255, 255, 255, 0.2);
                 }
                 
                 body {
@@ -97,10 +111,17 @@
                 @media (max-width: 768px) {
                     .notification-bar {
                         padding: 0.5rem;
+                        font-size: 0.9rem;
                     }
                     
                     body {
                         margin-top: 50px;
+                    }
+                    
+                    .notification-bar .close-btn {
+                        width: 25px;
+                        height: 25px;
+                        font-size: 1.2rem;
                     }
                 }
             `;
@@ -119,6 +140,14 @@
         
         if (notificationData && notificationData.active && notificationData.message) {
             showNotification(notificationData.message);
+        }
+    });
+    
+    // পেজের সকল লিংক ক্লিক করার সময় নোটিফিকেশন বন্ধ না হওয়া নিশ্চিত করা
+    document.addEventListener('click', function(e) {
+        if (e.target.tagName === 'A') {
+            // লিংক ক্লিক করলে নোটিফিকেশন বন্ধ হবে না
+            return;
         }
     });
 })();
